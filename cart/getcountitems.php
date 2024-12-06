@@ -1,27 +1,26 @@
 <?php 
 
- include "../connect.php" ; 
+include "../connect.php"; 
 
- $usersid = filterRequest("usersid") ; 
- $itemsid = filterRequest("itemsid") ; 
+$usersid = filterRequest("usersid"); 
+$itemsid = filterRequest("itemsid"); 
 
- $stmt = $con->prepare("SELECT COUNT(cart.cart_id) as countitems  FROM `cart` WHERE cart_usersid = $usersid AND cart_itemsid  =  $itemsid");
- $stmt->execute() ; 
+$stmt = $con->prepare("SELECT COUNT(cart.cart_id) as countitems FROM `cart` WHERE cart_usersid = :usersid AND cart_itemsid = :itemsid AND cart_orders = 0 ");
+$stmt->bindParam(':usersid', $usersid, PDO::PARAM_INT);
+$stmt->bindParam(':itemsid', $itemsid, PDO::PARAM_INT);
+$stmt->execute(); 
 
- $count = $stmt->rowCount() ; 
+$count = $stmt->rowCount(); 
 
- $data = $stmt->fetchColumn() ; 
- 
+$data = $stmt->fetchColumn(); 
 
-  if ($count > 0 ){
-    
-    echo json_encode(array("status" => "success" , "data" => $data)) ; 
+// تحويل البيانات إلى نص
+$dataAsString = strval($data);
 
-  } else {
-
-    echo json_encode(array("status" => "success" , "data" => "0")) ; 
-
-  }
-
+if ($count > 0) {
+    echo json_encode(array("status" => "success", "data" => $dataAsString)); 
+} else {
+    echo json_encode(array("status" => "success", "data" => "0")); 
+}
 
 ?>

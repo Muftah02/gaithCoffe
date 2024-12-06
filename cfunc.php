@@ -11,7 +11,7 @@ function filterRequest($requestname)
     return  htmlspecialchars(strip_tags($_POST[$requestname]));
 }
 
-function getAllData($table, $where = null, $values = null, $json = true )
+function getAllData($table, $where = null, $values = null, $json = true)
 {
     global $con;
     $data = array();
@@ -36,7 +36,7 @@ function getAllData($table, $where = null, $values = null, $json = true )
     }
 
     // إرجاع النتائج بصيغة JSON أو مصفوفة
-    if ($json == true) {
+    if ($json) {
         if ($count > 0) {
             echo json_encode(array("status" => "success", "data" => $data));
         } else {
@@ -227,59 +227,4 @@ function sendEmail($to, $title, $body)
 {
     $header = "From: support@Gaith.host " . "\n" . "CC: gaithcoffe@gmail.com";
     mail($to, $title, $body, $header);
-}
-function sendGCM($title, $message, $topic, $pageid, $pagename)
-{
-
-
-    $url = 'https://fcm.googleapis.com/fcm/send';
-
-    $fields = array(
-        "to" => '/topics/' . $topic,
-        'priority' => 'high',
-        'content_available' => true,
-
-        'notification' => array(
-            "body" =>  $message,
-            "title" =>  $title,
-            "click_action" => "FLUTTER_NOTIFICATION_CLICK",
-            "sound" => "default"
-
-        ),
-        'data' => array(
-            "pageid" => $pageid,
-            "pagename" => $pagename
-        )
-
-    );
-
-
-    $fields = json_encode($fields);
-    $headers = array(
-        'Authorization: key=' . "AIzaSyDbcPB1fsnMMR93oD2XGEDvQnonZU6ogIU",
-        'Content-Type: application/json'
-    );
-
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
-
-    $result = curl_exec($ch);
-    return $result;
-    curl_close($ch);
-}
-
-
-
-function insertNotify($title, $body, $userid, $topic, $pageid, $pagename)
-{
-    global $con;
-    $stmt  = $con->prepare("INSERT INTO `notification`(  `notification_title`, `notification_body`, `notification_userid`) VALUES (? , ? , ?)");
-    $stmt->execute(array($title, $body, $userid));
-    sendGCM($title,  $body, $topic, $pageid, $pagename);
-    $count = $stmt->rowCount();
-    return $count;
 }
