@@ -55,3 +55,10 @@ SELECT COUNT(cart_id) as countitems , cart.* , items.*  , (items_price - (items_
 INNER JOIN items ON items.items_id = cart.cart_itemsid
 WHERE cart_orders != 0 
 GROUP by cart_itemsid   ; 
+
+
+CREATE or REPLACE VIEW itemstopselling AS 
+SELECT COUNT(cart_id) as countitems , cart.* , items.*  , (items_price - (items_price * items_discount / 100 ))  as itemspricedisount  FROM cart 
+INNER JOIN items ON items.items_id = cart.cart_itemsid
+WHERE cart_orders != 0 
+GROUP by cart_itemsid   ; 

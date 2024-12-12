@@ -2,9 +2,6 @@
 
 include "./connect.php";
 
- 
- 
-
 $stmt = $con->prepare("SELECT items1view.* , 1 as favorite , (items_price - (items_price * items_discount / 100 ))  as itemspricedisount  FROM items1view 
 INNER JOIN favorite ON favorite.favorite_itemsid = items1view.items_id  
 WHERE items_discount != 0
@@ -18,6 +15,11 @@ $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $count  = $stmt->rowCount();
 
 if ($count > 0) {
+    // Convert all values to strings
+    $data = array_map(function($row) {
+        return array_map('strval', $row);
+    }, $data);
+
     echo json_encode(array("status" => "success", "data" => $data));
 } else {
     echo json_encode(array("status" => "failure"));
