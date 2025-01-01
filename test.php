@@ -4,7 +4,8 @@ $notAuth = "" ;
 
 include "connect.php" ; 
  
-sendGCM("hi"  , "How Are You" , "users16" , "" , "") ; 
+mail("muftahabokel@gmail.com", "hgghg", "jhg", "ghh");
+ 
 
 echo "Send"  ;
 

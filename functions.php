@@ -3,6 +3,7 @@
 // ====================================
 //  Copyright Reserved muftah abokel 
 // ====================================
+// date_default_timezone_set("Africa/Tripoli");
 
 define("MB", 1048576);
 
@@ -38,7 +39,7 @@ function getAllData($table, $where = null, $values = null, $json = true )
     // إرجاع النتائج بصيغة JSON أو مصفوفة
     if ($json == true) {
         if ($count > 0) {
-            echo json_encode(array("status" => "success", "data" => $data));
+            echo json_encode(array("status" => "success", "data" => $data),JSON_UNESCAPED_UNICODE);
         } else {
             echo json_encode(array("status" => "failure"));
         }
@@ -75,7 +76,7 @@ function getData($table, $where = null, $values = null, $json = true)
     // إرجاع النتائج بصيغة JSON
     if ($json == true) {
         if ($count > 0) {
-            echo json_encode(array("status" => "success", "data" => $data));
+            echo json_encode(array("status" => "success", "data" => $data),JSON_UNESCAPED_UNICODE);
         } else {
             echo json_encode(array("status" => "failure"));
         }
@@ -154,31 +155,34 @@ function deleteData($table, $where, $json = true)
     return $count;
 }
 
-function imageUpload($imageRequest)
+function imageUpload($dir, $imageRequest)
 {
     global $msgError;
-    $imagename  = rand(1000, 10000) . $_FILES[$imageRequest]['name'];
-    $imagetmp   = $_FILES[$imageRequest]['tmp_name'];
-    $imagesize  = $_FILES[$imageRequest]['size'];
-    $allowExt   = array("jpg", "png", "gif", "mp3", "pdf");
-    $strToArray = explode(".", $imagename);
-    $ext        = end($strToArray);
-    $ext        = strtolower($ext);
+    if (isset($_FILES[$imageRequest])) {
+        $imagename  = rand(1000, 10000) . $_FILES[$imageRequest]['name'];
+        $imagetmp   = $_FILES[$imageRequest]['tmp_name'];
+        $imagesize  = $_FILES[$imageRequest]['size'];
+        $allowExt   = array("jpg", "png", "gif", "mp3", "pdf" , "svg");
+        $strToArray = explode(".", $imagename);
+        $ext        = end($strToArray);
+        $ext        = strtolower($ext);
 
-    if (!empty($imagename) && !in_array($ext, $allowExt)) {
-        $msgError = "EXT";
-    }
-    if ($imagesize > 2 * MB) {
-        $msgError = "size";
-    }
-    if (empty($msgError)) {
-        move_uploaded_file($imagetmp,  "../upload/" . $imagename);
-        return $imagename;
-    } else {
-        return "fail";
+        if (!empty($imagename) && !in_array($ext, $allowExt)) {
+            $msgError = "EXT";
+        }
+        if ($imagesize > 2 * MB) {
+            $msgError = "size";
+        }
+        if (empty($msgError)) {
+            move_uploaded_file($imagetmp,  $dir . "/" . $imagename);
+            return $imagename;
+        } else {
+            return "fail";
+        }
+    }else {
+        return 'empty' ; 
     }
 }
-
 
 
 function deleteFile($dir, $imagename)
@@ -207,11 +211,11 @@ function checkAuthenticate()
 
 function   printFailure($message = "none")
 {
-    echo     json_encode(array("status" => "failure", "message" => $message));
+    echo     json_encode(array("status" => "failure", "message" => $message),JSON_UNESCAPED_UNICODE);
 }
 function   printSuccess($message = "none")
 {
-    echo     json_encode(array("status" => "success", "message" => $message));
+    echo     json_encode(array("status" => "success", "message" => $message),JSON_UNESCAPED_UNICODE);
 }
 
 function result($count)
